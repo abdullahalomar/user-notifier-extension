@@ -1,0 +1,115 @@
+// Load local bundled Socket.io client in Service Worker
+importScripts('lib/socket.io.min.js');
+
+const SERVER_URL = 'http://192.168.68.134:3000';
+let socket = null;
+let currentUserId = null;
+let currentUserName = null;
+
+// Ensure unique persistent userId exists in chrome.storage.local
+async function getOrCreateUserData() {
+  const data = await chrome.storage.local.get(['userId', 'userName']);
+  
+  if (!data.userId) {
+    data.userId = crypto.randomUUID();
+    data.userName = 'User_' + data.userId.slice(0, 5);
+    await chrome.storage.local.set({ userId: data.userId, userName: data.userName });
+  }
+
+  currentUserId = data.userId;
+  currentUserName = data.userName || ('User_' + data.userId.slice(0, 5));
+  return { userId: currentUserId, userName: currentUserName };
+}
+
+// Initialize Socket Connection
+async function initSocket() {
+  const { userId, userName } = await getOrCreateUserData();
+
+  if (socket && socket.connected) return;
+
+  socket = io(SERVER_URL, {
+    transports: ['websocket', 'polling'],
+    reconnection: true
+  });
+
+  socket.on('connect', () => {
+    console.log('✅ Connected to notification server as:', userName, `(${userId})`);
+    socket.emit('register_user', { userId, userName });
+  });
+
+  socket.on('update_user_list', (usersList) => {
+    // Store active online users in storage for popup UI
+    chrome.storage.local.set({ onlineUsers: usersList });
+  });
+
+  socket.on('play_sound_notification', async ({ senderName }) => {
+    console.log(`🔔 Received sound trigger from: ${senderName}`);
+    await triggerSoundPlayback(senderName);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('❌ Disconnected from notification server');
+  });
+}
+
+// Create Offscreen document and send play command
+async function triggerSoundPlayback(senderName) {
+  try {
+    const hasDoc = await chrome.offscreen.hasDocument();
+    if (!hasDoc) {
+      await chrome.offscreen.createDocument({
+        url: 'offscreen.html',
+        reasons: ['AUDIO_PLAYBACK'],
+        justification: 'Play notification sound when targeted by another user'
+      });
+    }
+
+    // Send trigger to offscreen document
+    chrome.runtime.sendMessage({ action: 'PLAY_SOUND', senderName });
+
+    // Show system notification
+    chrome.notifications.create(`notif_${Date.now()}`, {
+      type: 'basic',
+      iconUrl: 'icons/icon-128.png',
+      title: '🔔 Notification Received!',
+      message: `${senderName || 'Someone'} clicked your name!`
+    });
+  } catch (err) {
+    console.error('Error playing sound:', err);
+  }
+}
+
+// Listen for messages from popup.js
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  (async () => {
+    if (message.action === 'SEND_TRIGGER') {
+      const { targetUserId } = message;
+      const { userName } = await chrome.storage.local.get('userName');
+      
+      if (socket && socket.connected) {
+        socket.emit('send_sound_trigger', {
+          targetUserId,
+          senderName: userName || 'Someone'
+        });
+        sendResponse({ success: true });
+      } else {
+        sendResponse({ success: false, error: 'Socket not connected' });
+      }
+    } else if (message.action === 'UPDATE_NAME') {
+      const { newName } = message;
+      await chrome.storage.local.set({ userName: newName });
+      currentUserName = newName;
+      if (socket && socket.connected) {
+        socket.emit('update_name', { userId: currentUserId, newName });
+      }
+      sendResponse({ success: true });
+    } else if (message.action === 'RECONNECT') {
+      await initSocket();
+      sendResponse({ success: true });
+    }
+  })();
+  return true; // Keep message channel open for async response
+});
+
+// Start socket connection on service worker startup
+initSocket();
