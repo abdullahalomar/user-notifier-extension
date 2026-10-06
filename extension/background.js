@@ -1,7 +1,7 @@
 // Load local bundled Socket.io client in Service Worker
 importScripts('lib/socket.io.min.js');
 
-const SERVER_URL = 'http://192.168.68.134:3000';
+const SERVER_URL = 'https://user-notifier-extension.onrender.com';
 let socket = null;
 let currentUserId = null;
 let currentUserName = null;
