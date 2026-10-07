@@ -4,11 +4,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   const uuidDisplay = document.getElementById('uuidDisplay');
   const userList = document.getElementById('userList');
   const onlineCount = document.getElementById('onlineCount');
+  const soundSelect = document.getElementById('soundSelect');
+  const testSoundBtn = document.getElementById('testSoundBtn');
 
-  // Load user data from storage
-  const { userId, userName, onlineUsers = [] } = await chrome.storage.local.get([
+  // Load user data & sound settings from storage
+  const { userId, userName, soundType = 'boing', onlineUsers = [] } = await chrome.storage.local.get([
     'userId',
     'userName',
+    'soundType',
     'onlineUsers'
   ]);
 
@@ -18,6 +21,35 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (userName) {
     nameInput.value = userName;
   }
+  if (soundType) {
+    soundSelect.value = soundType;
+  }
+
+  // Save selected funny sound preset
+  soundSelect.addEventListener('change', async () => {
+    const selectedSound = soundSelect.value;
+    await chrome.storage.local.set({ soundType: selectedSound });
+  });
+
+  // Test selected sound button
+  testSoundBtn.addEventListener('click', async () => {
+    const selectedSound = soundSelect.value;
+    
+    // Ensure offscreen document exists then trigger sound
+    try {
+      const hasDoc = await chrome.offscreen.hasDocument();
+      if (!hasDoc) {
+        await chrome.offscreen.createDocument({
+          url: 'offscreen.html',
+          reasons: ['AUDIO_PLAYBACK'],
+          justification: 'Test notification sound playback'
+        });
+      }
+      chrome.runtime.sendMessage({ action: 'PLAY_SOUND', soundType: selectedSound });
+    } catch (err) {
+      console.error('Error testing sound:', err);
+    }
+  });
 
   // Update display name event
   saveNameBtn.addEventListener('click', () => {
@@ -54,7 +86,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="user-id-sub">${escapeHtml(user.userId.slice(0, 8))}...</div>
           </div>
         </div>
-        <div class="sound-icon" title="Click to trigger sound">🔊</div>
+        <div class="sound-trigger-btn" title="Click to trigger funny sound">🤪 Send Sound</div>
       `;
 
       card.addEventListener('click', () => {

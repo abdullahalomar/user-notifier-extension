@@ -6,14 +6,16 @@
   <title>User Sound Notifier</title>
   <style>
     :root {
-      --bg-color: #0f172a;
-      --card-bg: rgba(30, 41, 59, 0.7);
+      --bg-color: #0d1117;
+      --card-bg: rgba(22, 27, 34, 0.85);
+      --card-hover: rgba(33, 38, 45, 0.95);
       --border-color: rgba(255, 255, 255, 0.1);
-      --primary: #6366f1;
-      --primary-hover: #4f46e5;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --accent: #22c55e;
+      --primary: #8b5cf6;
+      --primary-hover: #7c3aed;
+      --accent-cyan: #06b6d4;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --accent-green: #10b981;
     }
 
     * {
@@ -24,40 +26,56 @@
     }
 
     body {
-      width: 320px;
+      width: 340px;
       background-color: var(--bg-color);
       color: var(--text-main);
       padding: 16px;
+      background-image: radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 40%);
     }
 
     .header {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 12px;
       margin-bottom: 16px;
       padding-bottom: 12px;
       border-bottom: 1px solid var(--border-color);
     }
 
+    .header-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      box-shadow: 0 0 14px rgba(139, 92, 246, 0.5);
+    }
+
+    .title-group {
+      display: flex;
+      flex-direction: column;
+    }
+
     .title {
       font-size: 16px;
       font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      background: linear-gradient(135deg, #a78bfa, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
-    .title span {
-      font-size: 18px;
+    .subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
     }
 
     .user-profile {
       background: var(--card-bg);
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
       border: 1px solid var(--border-color);
-      border-radius: 10px;
+      border-radius: 12px;
       padding: 12px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     .profile-label {
@@ -65,83 +83,132 @@
       color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin-bottom: 4px;
-    }
-
-    .profile-uuid {
-      font-size: 11px;
-      font-family: monospace;
-      color: #60a5fa;
-      margin-top: 4px;
-      word-break: break-all;
-    }
-
-    .name-input-group {
-      display: flex;
-      gap: 6px;
-      margin-top: 8px;
-    }
-
-    input[type="text"] {
-      flex: 1;
-      background: #0f172a;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      padding: 6px 10px;
-      color: var(--text-main);
-      font-size: 13px;
-      outline: none;
-    }
-
-    input[type="text"]:focus {
-      border-color: var(--primary);
-    }
-
-    .btn {
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      padding: 6px 12px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .btn:hover {
-      background: var(--primary-hover);
-    }
-
-    .section-title {
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
+    .name-input-group {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"], select {
+      flex: 1;
+      background: #161b22;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 7px 10px;
+      color: var(--text-main);
+      font-size: 13px;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    input[type="text"]:focus, select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 8px rgba(139, 92, 246, 0.3);
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--primary), var(--accent-cyan));
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s, opacity 0.2s;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .profile-uuid {
+      font-size: 10px;
+      font-family: monospace;
+      color: #38bdf8;
+      word-break: break-all;
+    }
+
+    .sound-settings {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 14px;
+    }
+
+    .sound-controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 6px;
+    }
+
+    .btn-test {
+      background: rgba(139, 92, 246, 0.2);
+      border: 1px solid rgba(139, 92, 246, 0.4);
+      color: #c084fc;
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .btn-test:hover {
+      background: rgba(139, 92, 246, 0.35);
+      color: #fff;
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
     .badge {
-      background: rgba(34, 197, 94, 0.2);
-      color: var(--accent);
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--accent-green);
       font-size: 11px;
       padding: 2px 8px;
       border-radius: 12px;
+      border: 1px solid rgba(16, 185, 129, 0.3);
     }
 
     .user-list {
       display: flex;
       flex-direction: column;
       gap: 8px;
-      max-height: 220px;
+      max-height: 180px;
       overflow-y: auto;
     }
 
     .user-card {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
-      border-radius: 8px;
+      border-radius: 10px;
       padding: 10px 12px;
       display: flex;
       align-items: center;
@@ -151,8 +218,10 @@
     }
 
     .user-card:hover {
+      background: var(--card-hover);
       border-color: var(--primary);
       transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     }
 
     .user-info {
@@ -165,8 +234,8 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 6px var(--accent);
+      background: var(--accent-green);
+      box-shadow: 0 0 8px var(--accent-green);
     }
 
     .user-name {
@@ -180,30 +249,41 @@
       font-family: monospace;
     }
 
-    .sound-icon {
-      font-size: 14px;
-      opacity: 0.7;
+    .sound-trigger-btn {
+      background: rgba(139, 92, 246, 0.15);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      color: #c084fc;
+      font-weight: 600;
+      transition: all 0.2s;
     }
 
-    .user-card:hover .sound-icon {
-      opacity: 1;
-      transform: scale(1.15);
+    .user-card:hover .sound-trigger-btn {
+      background: var(--primary);
+      color: #fff;
+      transform: scale(1.05);
     }
 
     .empty-state {
       text-align: center;
       color: var(--text-muted);
       font-size: 12px;
-      padding: 20px 10px;
+      padding: 16px 10px;
       background: var(--card-bg);
-      border-radius: 8px;
+      border-radius: 10px;
       border: 1px dashed var(--border-color);
     }
   </style>
 </head>
 <body>
   <div class="header">
-    <div class="title"><span>🔔</span> Sound Notifier</div>
+    <img src="icons/logo.png" alt="Sonic Echo Logo" class="header-logo">
+    <div class="title-group">
+      <div class="title">User Sound Notifier</div>
+      <div class="subtitle">Real-time Funny Sound Trigger</div>
+    </div>
   </div>
 
   <div class="user-profile">
@@ -213,6 +293,20 @@
       <button class="btn" id="saveNameBtn">Save</button>
     </div>
     <div class="profile-uuid" id="uuidDisplay">Loading UUID...</div>
+  </div>
+
+  <div class="sound-settings">
+    <div class="profile-label">Funny Sound Preset</div>
+    <div class="sound-controls">
+      <select id="soundSelect">
+        <option value="boing">🤪 Cartoon Boing</option>
+        <option value="quack">🦆 Duck Quack</option>
+        <option value="wahwah">🎺 Sad Trombone</option>
+        <option value="pop">🎈 Cartoon Pop</option>
+        <option value="whistle">🌀 Slide Whistle</option>
+      </select>
+      <button class="btn-test" id="testSoundBtn">🔊 Test</button>
+    </div>
   </div>
 
   <div class="section-title">

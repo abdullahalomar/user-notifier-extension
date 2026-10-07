@@ -60,19 +60,21 @@ async function triggerSoundPlayback(senderName) {
       await chrome.offscreen.createDocument({
         url: 'offscreen.html',
         reasons: ['AUDIO_PLAYBACK'],
-        justification: 'Play notification sound when targeted by another user'
+        justification: 'Play funny notification sound when targeted by another user'
       });
     }
 
+    const { soundType = 'boing' } = await chrome.storage.local.get('soundType');
+
     // Send trigger to offscreen document
-    chrome.runtime.sendMessage({ action: 'PLAY_SOUND', senderName });
+    chrome.runtime.sendMessage({ action: 'PLAY_SOUND', senderName, soundType });
 
     // Show system notification
     chrome.notifications.create(`notif_${Date.now()}`, {
       type: 'basic',
       iconUrl: 'icons/icon-128.png',
-      title: '🔔 Notification Received!',
-      message: `${senderName || 'Someone'} clicked your name!`
+      title: '🤪 Funny Sound Received!',
+      message: `${senderName || 'Someone'} triggered a funny sound for you!`
     });
   } catch (err) {
     console.error('Error playing sound:', err);
