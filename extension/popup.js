@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const messageInput = document.getElementById('messageInput');
 
   // Load user data & sound settings from storage
-  const { userId, userName, soundType = 'boing', onlineUsers = [] } = await chrome.storage.local.get([
+  const { userId, userName, soundType = 'chime', onlineUsers = [] } = await chrome.storage.local.get([
     'userId',
     'userName',
     'soundType',
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     soundSelect.value = soundType;
   }
 
-  // Save selected funny sound preset
+  // Save selected sound preset
   soundSelect.addEventListener('change', async () => {
     const selectedSound = soundSelect.value;
     await chrome.storage.local.set({ soundType: selectedSound });
@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="user-id-sub">${escapeHtml(user.userId.slice(0, 8))}...</div>
           </div>
         </div>
-        <div class="sound-trigger-btn" title="Click to send notification with sound">🤪 Send</div>
+        <div class="sound-trigger-btn" title="Click to send notification chime">🔔 Notify</div>
       `;
 
       card.addEventListener('click', () => {

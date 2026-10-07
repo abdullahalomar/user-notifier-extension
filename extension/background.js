@@ -60,22 +60,22 @@ async function triggerSoundPlayback(senderName, customMessage) {
       await chrome.offscreen.createDocument({
         url: 'offscreen.html',
         reasons: ['AUDIO_PLAYBACK'],
-        justification: 'Play funny notification sound when targeted by another user'
+        justification: 'Play notification sound when targeted by another user'
       });
     }
 
-    const { soundType = 'boing' } = await chrome.storage.local.get('soundType');
+    const { soundType = 'chime' } = await chrome.storage.local.get('soundType');
 
     // Send trigger to offscreen document
     chrome.runtime.sendMessage({ action: 'PLAY_SOUND', senderName, soundType });
 
-    // Format beautiful notification message featuring sender's nickname
+    // Format notification message featuring sender's nickname
     const nickname = senderName || 'Someone';
     const titles = [
-      `✨ Notification from ${nickname}!`,
-      `🎉 ${nickname} sent you a sound!`,
-      `🤪 ${nickname} is calling your attention!`,
-      `💌 Greetings from ${nickname}`
+      `🔔 Notification from ${nickname}`,
+      `✨ New alert from ${nickname}`,
+      `📩 Message received from ${nickname}`,
+      `🌐 ${nickname} sent a notification`
     ];
     const randomTitle = titles[Math.floor(Math.random() * titles.length)];
 
@@ -84,10 +84,10 @@ async function triggerSoundPlayback(senderName, customMessage) {
       notificationBody = `💬 "${customMessage.trim()}" — ${nickname}`;
     } else {
       const phrases = [
-        `🌟 ${nickname} আপনাকে একটি বিশেষ ফানি সাউন্ড পাঠিয়েছেন! 🎶`,
-        `🤪 ${nickname} আপনার মনোযোগ আকর্ষণ করছেন! শুনুন সুন্দর সাউন্ডটি!`,
-        `🎉 ${nickname} (Nickname) আপনার দিনটিকে সুন্দর করতে একটি ফানি টিউন পাঠিয়েছেন! 🎈`,
-        `✨ ${nickname} sent you a warm smile and a hilarious chime!`
+        `🌟 ${nickname} আপনাকে একটি নোটিফিকেশন পাঠিয়েছেন!`,
+        `🔔 ${nickname} sent you a notification chime!`,
+        `✨ ${nickname} clicked to notify you.`,
+        `📩 You have a new notification from ${nickname}.`
       ];
       notificationBody = phrases[Math.floor(Math.random() * phrases.length)];
     }
