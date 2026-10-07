@@ -42,9 +42,9 @@ async function initSocket() {
     chrome.storage.local.set({ onlineUsers: usersList });
   });
 
-  socket.on('play_sound_notification', async ({ senderName }) => {
+  socket.on('play_sound_notification', async ({ senderName, customMessage }) => {
     console.log(`🔔 Received sound trigger from: ${senderName}`);
-    await triggerSoundPlayback(senderName);
+    await triggerSoundPlayback(senderName, customMessage);
   });
 
   socket.on('disconnect', () => {
@@ -53,7 +53,7 @@ async function initSocket() {
 }
 
 // Create Offscreen document and send play command
-async function triggerSoundPlayback(senderName) {
+async function triggerSoundPlayback(senderName, customMessage) {
   try {
     const hasDoc = await chrome.offscreen.hasDocument();
     if (!hasDoc) {
@@ -69,12 +69,35 @@ async function triggerSoundPlayback(senderName) {
     // Send trigger to offscreen document
     chrome.runtime.sendMessage({ action: 'PLAY_SOUND', senderName, soundType });
 
-    // Show system notification
+    // Format beautiful notification message featuring sender's nickname
+    const nickname = senderName || 'Someone';
+    const titles = [
+      `✨ Notification from ${nickname}!`,
+      `🎉 ${nickname} sent you a sound!`,
+      `🤪 ${nickname} is calling your attention!`,
+      `💌 Greetings from ${nickname}`
+    ];
+    const randomTitle = titles[Math.floor(Math.random() * titles.length)];
+
+    let notificationBody = "";
+    if (customMessage && customMessage.trim()) {
+      notificationBody = `💬 "${customMessage.trim()}" — ${nickname}`;
+    } else {
+      const phrases = [
+        `🌟 ${nickname} আপনাকে একটি বিশেষ ফানি সাউন্ড পাঠিয়েছেন! 🎶`,
+        `🤪 ${nickname} আপনার মনোযোগ আকর্ষণ করছেন! শুনুন সুন্দর সাউন্ডটি!`,
+        `🎉 ${nickname} (Nickname) আপনার দিনটিকে সুন্দর করতে একটি ফানি টিউন পাঠিয়েছেন! 🎈`,
+        `✨ ${nickname} sent you a warm smile and a hilarious chime!`
+      ];
+      notificationBody = phrases[Math.floor(Math.random() * phrases.length)];
+    }
+
+    // Show system notification with sender nickname
     chrome.notifications.create(`notif_${Date.now()}`, {
       type: 'basic',
       iconUrl: 'icons/icon-128.png',
-      title: '🤪 Funny Sound Received!',
-      message: `${senderName || 'Someone'} triggered a funny sound for you!`
+      title: randomTitle,
+      message: notificationBody
     });
   } catch (err) {
     console.error('Error playing sound:', err);
@@ -85,13 +108,14 @@ async function triggerSoundPlayback(senderName) {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   (async () => {
     if (message.action === 'SEND_TRIGGER') {
-      const { targetUserId } = message;
+      const { targetUserId, customMessage } = message;
       const { userName } = await chrome.storage.local.get('userName');
       
       if (socket && socket.connected) {
         socket.emit('send_sound_trigger', {
           targetUserId,
-          senderName: userName || 'Someone'
+          senderName: userName || 'Someone',
+          customMessage: customMessage || ''
         });
         sendResponse({ success: true });
       } else {

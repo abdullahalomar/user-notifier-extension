@@ -38,8 +38,8 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      margin-bottom: 16px;
-      padding-bottom: 12px;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
       border-bottom: 1px solid var(--border-color);
     }
 
@@ -74,7 +74,7 @@
       border: 1px solid var(--border-color);
       border-radius: 12px;
       padding: 12px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
@@ -102,7 +102,7 @@
       border-radius: 8px;
       padding: 7px 10px;
       color: var(--text-main);
-      font-size: 13px;
+      font-size: 12px;
       outline: none;
       transition: all 0.2s;
     }
@@ -129,10 +129,6 @@
       transform: translateY(-1px);
     }
 
-    .btn:active {
-      transform: translateY(0);
-    }
-
     .profile-uuid {
       font-size: 10px;
       font-family: monospace;
@@ -145,14 +141,14 @@
       border: 1px solid var(--border-color);
       border-radius: 12px;
       padding: 12px;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
     .sound-controls {
       display: flex;
       gap: 8px;
       align-items: center;
-      margin-top: 6px;
+      margin-top: 4px;
     }
 
     .btn-test {
@@ -174,6 +170,14 @@
     .btn-test:hover {
       background: rgba(139, 92, 246, 0.35);
       color: #fff;
+    }
+
+    .msg-section {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
     }
 
     .section-title {
@@ -201,7 +205,7 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      max-height: 180px;
+      max-height: 160px;
       overflow-y: auto;
     }
 
@@ -282,21 +286,21 @@
     <img src="icons/logo.png" alt="Sonic Echo Logo" class="header-logo">
     <div class="title-group">
       <div class="title">User Sound Notifier</div>
-      <div class="subtitle">Real-time Funny Sound Trigger</div>
+      <div class="subtitle">Real-time Custom Sound Trigger</div>
     </div>
   </div>
 
   <div class="user-profile">
-    <div class="profile-label">Your Identity (Unique UUID)</div>
+    <div class="profile-label">Your Nickname</div>
     <div class="name-input-group">
-      <input type="text" id="nameInput" placeholder="Enter display name">
+      <input type="text" id="nameInput" placeholder="Enter your nickname">
       <button class="btn" id="saveNameBtn">Save</button>
     </div>
     <div class="profile-uuid" id="uuidDisplay">Loading UUID...</div>
   </div>
 
   <div class="sound-settings">
-    <div class="profile-label">Funny Sound Preset</div>
+    <div class="profile-label">Notification Sound</div>
     <div class="sound-controls">
       <select id="soundSelect">
         <option value="boing">🤪 Cartoon Boing</option>
@@ -307,6 +311,11 @@
       </select>
       <button class="btn-test" id="testSoundBtn">🔊 Test</button>
     </div>
+  </div>
+
+  <div class="msg-section">
+    <div class="profile-label">Optional Message to Send</div>
+    <input type="text" id="messageInput" placeholder="e.g. Knock knock! 🤪 or Hello friend!">
   </div>
 
   <div class="section-title">

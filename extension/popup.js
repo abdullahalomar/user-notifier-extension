@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const onlineCount = document.getElementById('onlineCount');
   const soundSelect = document.getElementById('soundSelect');
   const testSoundBtn = document.getElementById('testSoundBtn');
+  const messageInput = document.getElementById('messageInput');
 
   // Load user data & sound settings from storage
   const { userId, userName, soundType = 'boing', onlineUsers = [] } = await chrome.storage.local.get([
@@ -35,7 +36,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   testSoundBtn.addEventListener('click', async () => {
     const selectedSound = soundSelect.value;
     
-    // Ensure offscreen document exists then trigger sound
     try {
       const hasDoc = await chrome.offscreen.hasDocument();
       if (!hasDoc) {
@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // Update display name event
+  // Update display name / nickname event
   saveNameBtn.addEventListener('click', () => {
     const newName = nameInput.value.trim();
     if (newName) {
@@ -86,14 +86,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="user-id-sub">${escapeHtml(user.userId.slice(0, 8))}...</div>
           </div>
         </div>
-        <div class="sound-trigger-btn" title="Click to trigger funny sound">🤪 Send Sound</div>
+        <div class="sound-trigger-btn" title="Click to send notification with sound">🤪 Send</div>
       `;
 
       card.addEventListener('click', () => {
         card.style.opacity = '0.5';
+        const customMsg = messageInput ? messageInput.value.trim() : '';
+
         chrome.runtime.sendMessage({
           action: 'SEND_TRIGGER',
-          targetUserId: user.userId
+          targetUserId: user.userId,
+          customMessage: customMsg
         }, (response) => {
           card.style.opacity = '1';
           if (response && response.success) {

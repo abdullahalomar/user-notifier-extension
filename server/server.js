@@ -48,7 +48,7 @@ io.on('connection', (socket) => {
   });
 
   // Handle notification sound trigger sent to a targeted user
-  socket.on('send_sound_trigger', ({ targetUserId, senderName }) => {
+  socket.on('send_sound_trigger', ({ targetUserId, senderName, customMessage }) => {
     const targetUser = onlineUsers.get(targetUserId);
 
     if (targetUser) {
@@ -56,7 +56,8 @@ io.on('connection', (socket) => {
       
       // Emit ONLY to the specific target socket
       io.to(targetUser.socketId).emit('play_sound_notification', {
-        senderName: senderName || 'Someone'
+        senderName: senderName || 'Someone',
+        customMessage: customMessage || ''
       });
     } else {
       console.log(`⚠️ Target user ${targetUserId} not found or offline.`);
